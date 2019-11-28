@@ -1,6 +1,7 @@
 from flask import jsonify, request, send_file
 
-from app.get_image import get_image, SatelliteProvider
+from app.consts import SatelliteProvider
+from app.get_image import get_image
 
 
 def image():

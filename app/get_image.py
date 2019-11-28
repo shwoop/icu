@@ -1,24 +1,16 @@
 import json
 import logging
-from enum import Enum
 from hashlib import sha256
 from pathlib import Path
 
 import requests
 
 from app.config import GAPIKEY
+from app.consts import ARCGIS_URL, GAPI_MAP_URL, SatelliteProvider
 
 logger = logging.getLogger(__name__)
 
-GAPI_MAP_URL = 'https://maps.googleapis.com/maps/api/staticmap'
-ARCGIS_URL = 'https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export Web Map Task/execute'
-
 FILE_PATH = Path('files')
-
-
-class SatelliteProvider(Enum):
-    google = 1
-    arcgis = 2
 
 
 def get_image(

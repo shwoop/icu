@@ -1,16 +1,23 @@
-# Satellite Image Service
-
-ICU: I see you
+# ICU: I See You
 
 Caching service for satellite images.
 
-Currently only supports google's static image api (proprietary) but we should
-add support for ARCGIS (open).
+## Support
+
+* google maps static image api (proprietary)
+
+    This one is simple, it should work as is.
+
+* arcgis (open):
+
+    This is very janky, we can make a request and get an image back but we need to finely
+    tune the translation of a centre into x-y min-max based on zoom and generally check we're
+    getting back anything useful.
 
 ## Usage
 Something along the lines of:
 ```
-$ curl -X POST -json '{"latitude": 57.1463991, "longitude": -2.0934092}' \
+$ GAPIKEY=123 curl -X POST -json '{"latitude": 57.1463991, "longitude": -2.0934092}' \
     localhost:5050/api/v1/image
 ```
 Please consult the swagger.
