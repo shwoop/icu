@@ -27,17 +27,18 @@ def get_image(latitude: float, longitude: float, zoom: int = 13, size='600x400')
     if filename.is_file():
         return request_hash
 
+    image = google_get_image(params)
+
+    with open(filename, 'wb') as f:
+        f.write(image)
+
+    return request_hash
+
+
+def google_get_image(params) -> bytes:
     params.update({'key': GAPIKEY, 'maptype': 'satellite'})
     resp = requests.get(url=GAPI_MAP_URL, params=params)
     if resp.status_code != 200:
         logger.error(f'Problem: {resp.status_code} {resp.content}')
         resp.raise_for_status()
-
-    with open(filename, 'wb') as f:
-        f.write(resp.content)
-
-    # with open(filename, 'w') as f:
-    #     f.write('poop')
-
-    return request_hash
-
+    return resp.content
