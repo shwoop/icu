@@ -1,0 +1,5 @@
+[meta]
+version = 0.0.1
+long_name = Satellite image service
+description = REST API for querying satellite images
+name = icu

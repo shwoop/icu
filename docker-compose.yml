@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  icu-api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: gunicorn wsgi:app --config=app/config.py
+    volumes:
+      - ./:/opt/icu/
+    healthcheck:
+      test: nc -z localhost:5000
+      interval: 30s
+      timeout: 30s
+      retries: 15
