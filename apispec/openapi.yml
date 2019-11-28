@@ -44,6 +44,12 @@ paths:
                   type: number
                 zoom:
                   type: number
+                provider:
+                  type: string
+                  enum:
+                    - google
+                    - arcgis
+                  default: google
       responses:
         "200":
           description: Ship disambiguated

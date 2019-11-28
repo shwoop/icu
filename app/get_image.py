@@ -26,7 +26,7 @@ def get_image(
     longitude: float,
     zoom: int = 13,
     size: str = '600x400',
-    provider: SatelliteProvider = SatelliteProvider.arcgis
+    provider: SatelliteProvider = SatelliteProvider.google
 ):
     params = {
         'latitide': latitude,

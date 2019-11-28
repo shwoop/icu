@@ -1,11 +1,16 @@
 from flask import jsonify, request, send_file
 
-from app.get_image import get_image
+from app.get_image import get_image, SatelliteProvider
 
 
 def image():
     data = request.get_json()
-    image_hash = get_image(latitude=data['latitude'], longitude=data['longitude'])
+    args = {'latitude': data['latitude'], 'longitude': data['longitude']}
+    if provider := data.get('provider'):
+        args['provider'] = SatelliteProvider[provider]
+
+    image_hash = get_image(**args)
+
     resp = send_file(f'../files/{image_hash}.png', mimetype='image/png')
     resp.direct_passthrough = False
     return resp
