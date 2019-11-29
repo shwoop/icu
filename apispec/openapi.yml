@@ -50,6 +50,9 @@ paths:
                     - google
                     - arcgis
                   default: google
+              required:
+                - latitude
+                - longitude
       responses:
         "200":
           description: Ship disambiguated
