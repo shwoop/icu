@@ -12,10 +12,11 @@ def image():
     if zoom := data.get('zoom'):
         args['zoom'] = zoom
 
-    image_hash = get_image(**args)
+    image_hash, image_scale = get_image(**args)
 
     resp = send_file(f'../files/{image_hash}.png', mimetype='image/png')
     resp.direct_passthrough = False
+    resp.headers['X-Image-Scale'] = image_scale
     return resp
 
 

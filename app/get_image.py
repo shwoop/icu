@@ -1,8 +1,11 @@
 import json
 import logging
+import math
 from collections import defaultdict
+from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
+from typing import Callable, Dict
 
 import requests
 
@@ -14,13 +17,22 @@ logger = logging.getLogger(__name__)
 FILE_PATH = Path('files')
 
 
+@dataclass
+class ImageResponse:
+    image: bytes
+    scale: float
+
+
+ImageMethodT = Callable[[float, float, int, str], ImageResponse]
+
+
 def get_image(
     latitude: float,
     longitude: float,
     zoom: int = 13,
     size: str = '600x400',
     provider: SatelliteProvider = SatelliteProvider.google
-):
+) -> (str, float):
     params = {
         'latitide': latitude,
         'longitude': longitude,
@@ -35,15 +47,15 @@ def get_image(
     if filename.is_file():
         return request_hash
 
-    image = PROVIDER_METHODS[provider](latitude=latitude, longitude=longitude, zoom=zoom, size=size)
+    image_details = PROVIDER_METHODS[provider](latitude=latitude, longitude=longitude, zoom=zoom, size=size)
 
     with open(filename, 'wb') as f:
-        f.write(image)
+        f.write(image_details.image)
 
-    return request_hash
+    return request_hash, image_details.scale
 
 
-def google_get_image(latitude, longitude, zoom, size) -> bytes:
+def google_get_image(latitude: float, longitude: float, zoom: int, size: str) -> ImageResponse:
     params = {
         'center': f'{latitude},{longitude}',
         'size': size,
@@ -55,7 +67,10 @@ def google_get_image(latitude, longitude, zoom, size) -> bytes:
     if resp.status_code != 200:
         logger.error(f'Problem: {resp.status_code} {resp.content}')
         resp.raise_for_status()
-    return resp.content
+
+    # from the horses mouth: https://groups.google.com/forum/#!topic/google-maps-js-api-v3/hDRO4oHVSeM
+    scale = 156543.03392 * math.cos(latitude * math.pi / 180) / math.pow(2, zoom)
+    return ImageResponse(image=resp.content, scale=scale)
 
 
 ARCGIS_ZOOM_LEVELS = defaultdict(lambda: 0.0225)
@@ -64,7 +79,7 @@ ARCGIS_ZOOM_LEVELS.update({
 })
 
 
-def arcgis_get_image(latitude, longitude, zoom, size) -> bytes:
+def arcgis_get_image(latitude: float, longitude: float, zoom: int, size: str) -> ImageResponse:
     image_size = size.split('x')
 
     aspect_ratio = int(image_size[0]) / int(image_size[1])
@@ -122,10 +137,11 @@ def arcgis_get_image(latitude, longitude, zoom, size) -> bytes:
         logger.error(f'Problem: {resp.status_code} {resp.content}')
         resp.raise_for_status()
 
-    return resp.content
+    # todo: calculate scale
+    return ImageResponse(image=resp.content, scale=-1)
 
 
-PROVIDER_METHODS = {
+PROVIDER_METHODS: Dict[SatelliteProvider, ImageMethodT] = {
     SatelliteProvider.google: google_get_image,
     SatelliteProvider.arcgis: arcgis_get_image,
 }
