@@ -1,5 +1,6 @@
 import json
 import logging
+from collections import defaultdict
 from hashlib import sha256
 from pathlib import Path
 
@@ -57,14 +58,21 @@ def google_get_image(latitude, longitude, zoom, size) -> bytes:
     return resp.content
 
 
+ARCGIS_ZOOM_LEVELS = defaultdict(lambda: 0.0225)
+ARCGIS_ZOOM_LEVELS.update({
+    13: 0.0225,
+})
+
+
 def arcgis_get_image(latitude, longitude, zoom, size) -> bytes:
     image_size = size.split('x')
 
-    zoom_ratio = 0.1
-    xmin = latitude - zoom_ratio
-    xmax = latitude + zoom_ratio
-    ymin = longitude - zoom_ratio
-    ymax = longitude + zoom_ratio
+    aspect_ratio = int(image_size[0]) / int(image_size[1])
+    zoom_ratio = ARCGIS_ZOOM_LEVELS[zoom]
+    ymin = latitude - zoom_ratio
+    ymax = latitude + zoom_ratio
+    xmin = longitude - (zoom_ratio * aspect_ratio)
+    xmax = longitude + (zoom_ratio * aspect_ratio)
 
     web_map = {
         'mapOptions': {
@@ -83,7 +91,7 @@ def arcgis_get_image(latitude, longitude, zoom, size) -> bytes:
             'title': 'Topographic Basemap',
             'baseMapLayers': [
                 {
-                    'url': 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer'
+                    'url': 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
                 }
             ]
         },
