@@ -9,6 +9,8 @@ def image():
     args = {'latitude': data['latitude'], 'longitude': data['longitude']}
     if provider := data.get('provider'):
         args['provider'] = SatelliteProvider[provider]
+    if zoom := data.get('zoom'):
+        args['zoom'] = zoom
 
     image_hash = get_image(**args)
 
