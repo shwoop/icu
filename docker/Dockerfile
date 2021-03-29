@@ -1,6 +1,6 @@
 FROM python:3.8-alpine3.10
 
-WORKDIR /opt/disam/
+WORKDIR /opt/icu/
 
 COPY ./requirements.txt ./
 
