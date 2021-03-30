@@ -33,39 +33,28 @@ compose-ps:
 	@${COMPOSE_COMMAND} ps
 
 compose-build-cached:
-	@${COMPOSE_COMMAND} build disam-api
+	@${COMPOSE_COMMAND} build icu-api
 
 compose-build:
-	@${COMPOSE_COMMAND} build --no-cache disam-api
+	@${COMPOSE_COMMAND} build --no-cache icu-api
 
 compose-prepare: checkTest
 	@${COMPOSE_COMMAND} run --rm disam-dep uname -a
 
 compose-logs:
-	@${COMPOSE_COMMAND} logs --tail=20 disam-api
-
-compose-test-python: compose-test-dev-requirements
-	@${COMPOSE_COMMAND} exec -T disam-api ./test.sh --cov --junitxml ${REPORTS_JUNIT} --cov-report xml:${REPORTS_COVERAGE}
-
-compose-prepare-reports:
-	@${COMPOSE_COMMAND} exec -T disam-api mkdir -p reports
-	@${COMPOSE_COMMAND} exec -T disam-api chmod 777 reports
+	@${COMPOSE_COMMAND} logs --tail=20 icu-api
 
 compose-up:
-	@${COMPOSE_COMMAND} up -d disam-api
+	@${COMPOSE_COMMAND} up -d icu-api
 
 compose-down:
 	@${COMPOSE_COMMAND} down -v --rmi local --remove-orphans
 
 compose-test-dev-requirements:
-	@${COMPOSE_COMMAND} exec -T disam-api pip install -r requirements_dev.txt
+	@${COMPOSE_COMMAND} exec -T icu-api pip install -r requirements_dev.txt
 
 compose-test: compose-test-dev-requirements
-	@${COMPOSE_COMMAND} exec -T disam-api ./test.sh
-
-compose-test-full: compose-test-dev-requirements
-	@${COMPOSE_COMMAND} exec -T disam-api pip install -r requirements_dev.txt
-	@${COMPOSE_COMMAND} exec -T disam-api ./test.sh --cov --pylint
+	@${COMPOSE_COMMAND} exec -T icu-api pytest .
 
 clean-image:
 	rm -rfv images
