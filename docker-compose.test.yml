@@ -5,13 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-      cache_from:
-        - 178847878690.dkr.ecr.us-east-1.amazonaws.com/disam:testing
-        - 205287409906.dkr.ecr.us-east-1.amazonaws.com/disam:latest
-        - 205287409906.dkr.ecr.us-east-1.amazonaws.com/disam:testing
-        - disam:testing
-        - disam:latest
-        - disam:latest-test
     volumes:
       - ./:/opt/icu/
     healthcheck:
